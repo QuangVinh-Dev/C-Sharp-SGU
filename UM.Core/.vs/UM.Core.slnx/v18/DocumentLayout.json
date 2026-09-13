@@ -1,0 +1,68 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\buivi\\OneDrive\\Desktop\\UM\\UM.Core\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{1FD9C12A-34D5-AD3F-B5CA-CD02C38637F7}|UM.Core.csproj|c:\\users\\buivi\\onedrive\\desktop\\um\\um.core\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1FD9C12A-34D5-AD3F-B5CA-CD02C38637F7}|UM.Core.csproj|solutionrelative:class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E8F57A25-AF3A-1E0B-F82B-604D553F22E6}|..\\UM.UI\\UM.UI\\UM.UI.csproj|c:\\users\\buivi\\onedrive\\desktop\\um\\um.ui\\um.ui\\um.ui.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1FD9C12A-34D5-AD3F-B5CA-CD02C38637F7}|UM.Core.csproj|c:\\users\\buivi\\onedrive\\desktop\\um\\um.core\\um.core.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{1FD9C12A-34D5-AD3F-B5CA-CD02C38637F7}|UM.Core.csproj|solutionrelative:um.core.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "UM.UI.csproj",
+              "DocumentMoniker": "C:\\Users\\buivi\\OneDrive\\Desktop\\UM\\UM.UI\\UM.UI\\UM.UI.csproj",
+              "RelativeDocumentMoniker": "..\\UM.UI\\UM.UI\\UM.UI.csproj",
+              "ToolTip": "C:\\Users\\buivi\\OneDrive\\Desktop\\UM\\UM.UI\\UM.UI\\UM.UI.csproj",
+              "RelativeToolTip": "..\\UM.UI\\UM.UI\\UM.UI.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-09-12T05:57:57.405Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UM.Core.csproj",
+              "DocumentMoniker": "C:\\Users\\buivi\\OneDrive\\Desktop\\UM\\UM.Core\\UM.Core.csproj",
+              "RelativeDocumentMoniker": "UM.Core.csproj",
+              "ToolTip": "C:\\Users\\buivi\\OneDrive\\Desktop\\UM\\UM.Core\\UM.Core.csproj",
+              "RelativeToolTip": "UM.Core.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-09-12T05:05:37.888Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "C:\\Users\\buivi\\OneDrive\\Desktop\\UM\\UM.Core\\Class1.cs",
+              "RelativeDocumentMoniker": "Class1.cs",
+              "ToolTip": "C:\\Users\\buivi\\OneDrive\\Desktop\\UM\\UM.Core\\Class1.cs",
+              "RelativeToolTip": "Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-12T05:01:33.59Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
