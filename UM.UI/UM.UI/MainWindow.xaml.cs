@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using UM.UI.Views;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -26,6 +27,8 @@ namespace UM.UI
         public MainWindow()
         {
             InitializeComponent();
+            MainFrame.Navigate(typeof(TaskPage));
+
         }
     }
 }

@@ -12,8 +12,8 @@
     <Window.SystemBackdrop>
         <MicaBackdrop />
     </Window.SystemBackdrop>
-
+ 
     <Grid>
-
+        <Frame x:Name="MainFrame"/>
     </Grid>
 </Window>
