@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="UM.UI.Views.LoginPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid x:Name="RootGrid">
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#F0F4FF" Offset="0.0" />
+                <GradientStop Color="#FCEBFF" Offset="1.0" />
+            </LinearGradientBrush>
+        </Grid.Background>
+        
+        <Grid.Resources>
+            <ThemeShadow x:Name="SharedShadow" />
+        </Grid.Resources>
+        
+        <Grid x:Name="ShadowReceiver" />
+
+        <ScrollViewer>
+            <Grid Padding="0,40">
+                <Border Background="White" Width="380" CornerRadius="24" Padding="36"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Shadow="{StaticResource SharedShadow}"
+                        Translation="0,0,16">
+                    <StackPanel>
+                        <!-- Logo -->
+                        <StackPanel HorizontalAlignment="Center" Margin="0,0,0,24">
+                            <Grid Width="48" Height="48">
+                                <Border Background="#4B4FEF" CornerRadius="14,14,4,14" Width="34" Height="34" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                <Border Background="#FF8A65" CornerRadius="14,14,14,4" Width="22" Height="22" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <TextBlock Text="Chào bạn quay lại" FontSize="22" FontWeight="Bold" Foreground="#111" HorizontalAlignment="Center" Margin="0,0,0,8" />
+                        <TextBlock Text="Đăng nhập để tiếp tục trò chuyện với nhóm của bạn" FontSize="14" Foreground="#777" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,32" />
+
+                        <TextBlock Text="Email hoặc số điện thoại" FontSize="13" FontWeight="SemiBold" Foreground="#444" Margin="0,0,0,8" />
+                        <TextBox PlaceholderText="vidu@email.com" Background="#F5F6FB" BorderThickness="0" CornerRadius="12" Height="44" Margin="0,0,0,16" VerticalContentAlignment="Center" />
+
+                        <TextBlock Text="Mật khẩu" FontSize="13" FontWeight="SemiBold" Foreground="#444" Margin="0,0,0,8" />
+                        <PasswordBox PlaceholderText="•••••••••••" Background="#F5F6FB" BorderThickness="0" CornerRadius="12" Height="44" Margin="0,0,0,16" VerticalContentAlignment="Center" />
+
+                        <Grid Margin="0,0,0,32">
+                            <CheckBox Content="Ghi nhớ đăng nhập" FontSize="13" Foreground="#666" Margin="-4,0,0,0" />
+                            <HyperlinkButton Content="Quên mật khẩu?" FontSize="13" Foreground="#4B4FEF" HorizontalAlignment="Right" Click="ForgotPassword_Click" />
+                        </Grid>
+
+                        <Button Content="Đăng nhập" Background="#4B4FEF" Foreground="White" CornerRadius="12" Height="46" HorizontalAlignment="Stretch" FontWeight="SemiBold" Click="Login_Click" />
+
+                        <Grid Margin="0,24,0,24">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Height="1" Background="#EAEAEA" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="hoặc" Foreground="#AAAAAA" FontSize="13" Margin="16,0" />
+                            <Border Grid.Column="2" Height="1" Background="#EAEAEA" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Grid ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" Content="Google" HorizontalAlignment="Stretch" Height="44" CornerRadius="12" Background="White" BorderBrush="#EAEAEA" BorderThickness="1" Foreground="#444" />
+                            <Button Grid.Column="1" Content="Facebook" HorizontalAlignment="Stretch" Height="44" CornerRadius="12" Background="White" BorderBrush="#EAEAEA" BorderThickness="1" Foreground="#444" />
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,32,0,0">
+                            <TextBlock Text="Chưa có tài khoản?" Foreground="#666" FontSize="14" VerticalAlignment="Center" />
+                            <HyperlinkButton Content="Đăng ký" Foreground="#4B4FEF" FontSize="14" FontWeight="SemiBold" Margin="4,0,0,0" Click="Register_Click" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Page>

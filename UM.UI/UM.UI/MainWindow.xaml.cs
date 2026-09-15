@@ -27,7 +27,7 @@ namespace UM.UI
         public MainWindow()
         {
             InitializeComponent();
-            MainFrame.Navigate(typeof(TaskPage));
+            MainFrame.Navigate(typeof(SplashScreenPage));
 
         }
     }
