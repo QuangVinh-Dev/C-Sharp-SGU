@@ -48,18 +48,21 @@
                 </StackPanel>
             </Border>
         </DataTemplate>
+
     </Page.Resources>
 
     <Grid Background="#FFFFFF">
         <Grid.ColumnDefinitions>
             <!-- Function icons -->
             <ColumnDefinition Width="72"/>
-            <!-- Server images -->
-            <ColumnDefinition Width="78"/>
+            <!-- Server list with names -->
+            <ColumnDefinition Width="200"/>
             <!-- Channel sidebar -->
-            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="260"/>
             <!-- Main content -->
             <ColumnDefinition Width="*"/>
+            <!-- Members panel -->
+            <ColumnDefinition Width="240"/>
         </Grid.ColumnDefinitions>
 
         <!-- ============================================================ -->
@@ -157,25 +160,51 @@
         </Border>
 
         <!-- ============================================================ -->
-        <!-- COLUMN 1: Server Images                                       -->
+        <!-- COLUMN 1: Server List (with names)                            -->
         <!-- ============================================================ -->
         <Border Grid.Column="1"
                 Background="#F5F5F5"
                 BorderBrush="#E0E0E0"
                 BorderThickness="0,0,1,0">
-            <ScrollViewer VerticalScrollBarVisibility="Hidden"
-                          HorizontalScrollBarVisibility="Disabled">
-                <StackPanel x:Name="ServerListPanel"
-                            Spacing="14"
-                            Padding="0,16,0,16"
-                            HorizontalAlignment="Center">
-                    <!-- Server items are populated from code-behind -->
-                </StackPanel>
-            </ScrollViewer>
+            <Grid RowDefinitions="Auto,*,Auto">
+
+                <!-- Header -->
+                <Border Grid.Row="0"
+                        Padding="14,14,14,10"
+                        BorderBrush="#E0E0E0"
+                        BorderThickness="0,0,0,1">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Máy chủ"
+                                   FontSize="15"
+                                   FontWeight="Bold"
+                                   Foreground="#1A1A1A"
+                                   VerticalAlignment="Center"/>
+                        <Button Grid.Column="1"
+                                Content="+"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Foreground="#888888"
+                                Padding="6,2"
+                                VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- Server list -->
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Hidden"
+                              HorizontalScrollBarVisibility="Disabled"
+                              Padding="8,8,8,8">
+                    <StackPanel x:Name="ServerListPanel"
+                                Spacing="4"/>
+                </ScrollViewer>
+
+            </Grid>
         </Border>
 
         <!-- ============================================================ -->
-        <!-- COLUMN 1: Channel Sidebar                                     -->
+        <!-- COLUMN 2: Channel Sidebar                                     -->
         <!-- ============================================================ -->
         <Border Grid.Column="2"
                 Background="#FAFAFA"
@@ -189,11 +218,13 @@
                         BorderBrush="#E0E0E0"
                         BorderThickness="0,0,0,1">
                     <StackPanel>
-                        <TextBlock Text="Dự án SGU"
+                        <TextBlock x:Name="SidebarServerName"
+                                   Text="Dự án SGU"
                                    FontSize="16"
                                    FontWeight="Bold"
                                    Foreground="#1A1A1A"/>
-                        <TextBlock Text="Quản lý công việc nhóm"
+                        <TextBlock x:Name="SidebarServerDesc"
+                                   Text="Quản lý công việc nhóm"
                                    FontSize="12"
                                    Foreground="#888888"
                                    Margin="0,2,0,0"/>
@@ -282,10 +313,12 @@
                                    Margin="8,4,0,6"
                                    CharacterSpacing="60"/>
 
-                        <Border Background="Transparent"
+                        <Border x:Name="ChannelGeneral"
+                                Background="Transparent"
                                 CornerRadius="6"
                                 Padding="10,8"
-                                Margin="0,1">
+                                Margin="0,1"
+                                PointerPressed="Channel_PointerPressed">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <TextBlock Text="#" Foreground="#888888" FontSize="16" FontWeight="Bold"
                                            VerticalAlignment="Center"/>
@@ -294,10 +327,12 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="Transparent"
+                        <Border x:Name="ChannelThongBao"
+                                Background="Transparent"
                                 CornerRadius="6"
                                 Padding="10,8"
-                                Margin="0,1">
+                                Margin="0,1"
+                                PointerPressed="Channel_PointerPressed">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <TextBlock Text="#" Foreground="#888888" FontSize="16" FontWeight="Bold"
                                            VerticalAlignment="Center"/>
@@ -309,81 +344,49 @@
                         <!-- Separator -->
                         <Border Height="1" Background="#E8E8E8" Margin="8,10"/>
 
-                        <!-- Category: THÀNH VIÊN -->
-                        <TextBlock Text="THÀNH VIÊN"
+                        <!-- Category: QUẢN LÝ -->
+                        <TextBlock Text="QUẢN LÝ"
                                    FontSize="11"
                                    FontWeight="SemiBold"
                                    Foreground="#888888"
                                    Margin="8,4,0,6"
                                    CharacterSpacing="60"/>
 
-                        <!-- Members -->
-                        <Border Background="Transparent"
+                        <Border x:Name="ChannelMain"
+                                Background="Transparent"
                                 CornerRadius="6"
-                                Padding="10,6"
-                                Margin="0,1">
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <Border Width="28" Height="28" CornerRadius="14" Background="#4CAF50">
-                                    <TextBlock Text="V" Foreground="White" FontSize="12" FontWeight="SemiBold"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Vinh" Foreground="#333333" FontSize="13"/>
-                                </StackPanel>
+                                Padding="10,8"
+                                Margin="0,1"
+                                PointerPressed="Channel_PointerPressed">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE80F;" FontSize="14" Foreground="#888888"
+                                          VerticalAlignment="Center"/>
+                                <TextBlock Text="Tổng quan" Foreground="#555555" FontSize="14"
+                                           VerticalAlignment="Center"/>
                             </StackPanel>
                         </Border>
 
-                        <Border Background="Transparent"
+                        <Border x:Name="ChannelAssignTask"
+                                Background="Transparent"
                                 CornerRadius="6"
-                                Padding="10,6"
-                                Margin="0,1">
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <Border Width="28" Height="28" CornerRadius="14" Background="#2196F3">
-                                    <TextBlock Text="H" Foreground="White" FontSize="12" FontWeight="SemiBold"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Hùng" Foreground="#333333" FontSize="13"/>
-                                </StackPanel>
+                                Padding="10,8"
+                                Margin="0,1"
+                                PointerPressed="Channel_PointerPressed">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE71B;" FontSize="14" Foreground="#888888"
+                                          VerticalAlignment="Center"/>
+                                <TextBlock Text="Giao công việc" Foreground="#555555" FontSize="14"
+                                           VerticalAlignment="Center"/>
                             </StackPanel>
                         </Border>
 
-                        <Border Background="Transparent"
-                                CornerRadius="6"
-                                Padding="10,6"
-                                Margin="0,1">
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <Border Width="28" Height="28" CornerRadius="14" Background="#FF9800">
-                                    <TextBlock Text="L" Foreground="White" FontSize="12" FontWeight="SemiBold"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Linh" Foreground="#333333" FontSize="13"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Background="Transparent"
-                                CornerRadius="6"
-                                Padding="10,6"
-                                Margin="0,1">
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <Border Width="28" Height="28" CornerRadius="14" Background="#9C27B0">
-                                    <TextBlock Text="T" Foreground="White" FontSize="12" FontWeight="SemiBold"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Tuấn" Foreground="#333333" FontSize="13"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </Grid>
         </Border>
 
         <!-- ============================================================ -->
-        <!-- COLUMN 2: Main Content Area                                   -->
+        <!-- COLUMN 3: Main Content Area                                   -->
         <!-- ============================================================ -->
         <Grid Grid.Column="3"
               Background="#FFFFFF"
@@ -429,84 +432,587 @@
                 </Grid>
             </Border>
 
-            <!-- Task content area -->
-            <ScrollViewer Grid.Row="1"
-                          VerticalScrollBarVisibility="Auto"
-                          Padding="24,16,24,24">
-                <StackPanel x:Name="TaskContentPanel" Spacing="28">
+            <!-- Content panels (only one visible at a time) -->
+            <Grid Grid.Row="1">
 
-                    <!-- ===== SECTION: Todo ===== -->
-                    <StackPanel x:Name="TodoSection" Spacing="10">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Border Background="#FFF3E0" CornerRadius="4" Padding="8,3">
-                                <TextBlock Text="📋 TODO"
+                <!-- ===== TASK CONTENT (todo/doing/done channels) ===== -->
+                <ScrollViewer x:Name="TaskContentScrollViewer"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="24,16,24,24">
+                    <StackPanel x:Name="TaskContentPanel" Spacing="28">
+
+                        <!-- ===== SECTION: Todo ===== -->
+                        <StackPanel x:Name="TodoSection" Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Border Background="#FFF3E0" CornerRadius="4" Padding="8,3">
+                                    <TextBlock Text="📋 TODO"
+                                               FontSize="12"
+                                               FontWeight="Bold"
+                                               Foreground="#E65100"/>
+                                </Border>
+                                <TextBlock x:Name="TodoCountText"
                                            FontSize="12"
-                                           FontWeight="Bold"
-                                           Foreground="#E65100"/>
-                            </Border>
-                            <TextBlock x:Name="TodoCountText"
-                                       FontSize="12"
-                                       Foreground="#AAAAAA"
-                                       VerticalAlignment="Center"/>
+                                           Foreground="#AAAAAA"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <ItemsRepeater x:Name="TodoRepeater"
+                                           ItemTemplate="{StaticResource TaskCardTemplate}">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Spacing="8"/>
+                                </ItemsRepeater.Layout>
+                            </ItemsRepeater>
                         </StackPanel>
 
-                        <ItemsRepeater x:Name="TodoRepeater"
-                                       ItemTemplate="{StaticResource TaskCardTemplate}">
-                            <ItemsRepeater.Layout>
-                                <StackLayout Spacing="8"/>
-                            </ItemsRepeater.Layout>
-                        </ItemsRepeater>
-                    </StackPanel>
-
-                    <!-- ===== SECTION: Doing ===== -->
-                    <StackPanel x:Name="DoingSection" Spacing="10">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Border Background="#E8F0FE" CornerRadius="4" Padding="8,3">
-                                <TextBlock Text="🔄 DOING"
+                        <!-- ===== SECTION: Doing ===== -->
+                        <StackPanel x:Name="DoingSection" Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Border Background="#E8F0FE" CornerRadius="4" Padding="8,3">
+                                    <TextBlock Text="🔄 DOING"
+                                               FontSize="12"
+                                               FontWeight="Bold"
+                                               Foreground="#1A73E8"/>
+                                </Border>
+                                <TextBlock x:Name="DoingCountText"
                                            FontSize="12"
-                                           FontWeight="Bold"
-                                           Foreground="#1A73E8"/>
-                            </Border>
-                            <TextBlock x:Name="DoingCountText"
-                                       FontSize="12"
-                                       Foreground="#AAAAAA"
-                                       VerticalAlignment="Center"/>
+                                           Foreground="#AAAAAA"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <ItemsRepeater x:Name="DoingRepeater"
+                                           ItemTemplate="{StaticResource TaskCardTemplate}">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Spacing="8"/>
+                                </ItemsRepeater.Layout>
+                            </ItemsRepeater>
                         </StackPanel>
 
-                        <ItemsRepeater x:Name="DoingRepeater"
-                                       ItemTemplate="{StaticResource TaskCardTemplate}">
-                            <ItemsRepeater.Layout>
-                                <StackLayout Spacing="8"/>
-                            </ItemsRepeater.Layout>
-                        </ItemsRepeater>
-                    </StackPanel>
-
-                    <!-- ===== SECTION: Done ===== -->
-                    <StackPanel x:Name="DoneSection" Spacing="10">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Border Background="#E8F5E9" CornerRadius="4" Padding="8,3">
-                                <TextBlock Text="✅ DONE"
+                        <!-- ===== SECTION: Done ===== -->
+                        <StackPanel x:Name="DoneSection" Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Border Background="#E8F5E9" CornerRadius="4" Padding="8,3">
+                                    <TextBlock Text="✅ DONE"
+                                               FontSize="12"
+                                               FontWeight="Bold"
+                                               Foreground="#2E7D32"/>
+                                </Border>
+                                <TextBlock x:Name="DoneCountText"
                                            FontSize="12"
-                                           FontWeight="Bold"
-                                           Foreground="#2E7D32"/>
-                            </Border>
-                            <TextBlock x:Name="DoneCountText"
-                                       FontSize="12"
-                                       Foreground="#AAAAAA"
-                                       VerticalAlignment="Center"/>
+                                           Foreground="#AAAAAA"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <ItemsRepeater x:Name="DoneRepeater"
+                                           ItemTemplate="{StaticResource TaskCardTemplate}">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Spacing="8"/>
+                                </ItemsRepeater.Layout>
+                            </ItemsRepeater>
                         </StackPanel>
 
-                        <ItemsRepeater x:Name="DoneRepeater"
-                                       ItemTemplate="{StaticResource TaskCardTemplate}">
-                            <ItemsRepeater.Layout>
-                                <StackLayout Spacing="8"/>
-                            </ItemsRepeater.Layout>
-                        </ItemsRepeater>
                     </StackPanel>
+                </ScrollViewer>
 
+                <!-- ===== CHAT CONTENT (general/thông-báo channels) ===== -->
+                <Grid x:Name="ChatContentPanel"
+                      Visibility="Collapsed"
+                      RowDefinitions="*,Auto,Auto">
+
+                    <!-- Chat messages (rendered from code-behind for Teams-style bubbles) -->
+                    <ScrollViewer x:Name="ChatScrollViewer"
+                                  Grid.Row="0"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Padding="24,16,24,8">
+                        <StackPanel x:Name="ChatMessagesPanel" Spacing="16"/>
+                    </ScrollViewer>
+
+                    <!-- Image preview area (shown when image is selected) -->
+                    <Border x:Name="ImagePreviewArea"
+                            Grid.Row="1"
+                            Visibility="Collapsed"
+                            Padding="24,8,24,0">
+                        <Border Background="#F5F5F5"
+                                CornerRadius="8"
+                                Padding="10"
+                                BorderBrush="#E0E0E0"
+                                BorderThickness="1">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Image x:Name="PreviewImage"
+                                       MaxHeight="120"
+                                       MaxWidth="200"
+                                       Stretch="Uniform"
+                                       HorizontalAlignment="Left"/>
+                                <TextBlock x:Name="PreviewFileName"
+                                           Grid.Column="1"
+                                           FontSize="12"
+                                           Foreground="#666666"
+                                           VerticalAlignment="Center"
+                                           Margin="10,0,0,0"/>
+                                <Button x:Name="RemoveImageBtn"
+                                        Grid.Column="2"
+                                        Content="&#xE711;"
+                                        FontFamily="Segoe MDL2 Assets"
+                                        FontSize="12"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Foreground="#888888"
+                                        Padding="6"
+                                        Click="RemoveImage_Click"
+                                        VerticalAlignment="Top"/>
+                            </Grid>
+                        </Border>
+                    </Border>
+
+                    <!-- Chat input bar (Teams-style) -->
+                    <Border Grid.Row="2"
+                            Padding="24,10,24,16"
+                            BorderBrush="#E8E8E8"
+                            BorderThickness="0,1,0,0">
+                        <Border Background="#F5F5F5"
+                                CornerRadius="8"
+                                Padding="4">
+                            <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" ColumnSpacing="2">
+                                <!-- Attachment button -->
+                                <Button Grid.Column="0"
+                                        Content="+"
+                                        FontSize="16"
+                                        FontWeight="Bold"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Foreground="#666666"
+                                        Padding="10,6"
+                                        VerticalAlignment="Center"
+                                        ToolTipService.ToolTip="Đính kèm"/>
+
+                                <!-- Image picker button -->
+                                <Button Grid.Column="1"
+                                        Content="&#xE8B9;"
+                                        FontFamily="Segoe MDL2 Assets"
+                                        FontSize="16"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Foreground="#666666"
+                                        Padding="10,6"
+                                        VerticalAlignment="Center"
+                                        Click="PickImage_Click"
+                                        ToolTipService.ToolTip="Chọn ảnh"/>
+
+                                <!-- Clip/file button -->
+                                <Button Grid.Column="2"
+                                        Content="&#xE723;"
+                                        FontFamily="Segoe MDL2 Assets"
+                                        FontSize="16"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Foreground="#666666"
+                                        Padding="10,6"
+                                        VerticalAlignment="Center"
+                                        ToolTipService.ToolTip="Đính kèm tệp"/>
+
+                                <!-- Message input -->
+                                <TextBox x:Name="ChatInputBox"
+                                         Grid.Column="3"
+                                         PlaceholderText="Nhập tin nhắn..."
+                                         VerticalAlignment="Center"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         KeyDown="ChatInputBox_KeyDown"/>
+
+                                <!-- Send button -->
+                                <Button Grid.Column="4"
+                                        Content="Gửi"
+                                        Click="SendMessage_Click"
+                                        VerticalAlignment="Center"
+                                        Padding="16,8"
+                                        Background="#1A73E8"
+                                        Foreground="White"
+                                        CornerRadius="6"/>
+                            </Grid>
+                        </Border>
+                    </Border>
+                </Grid>
+
+                <!-- ===== MAIN DASHBOARD (Tổng quan channel) ===== -->
+                <ScrollViewer x:Name="MainDashboardPanel"
+                              Visibility="Collapsed"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="24,20,24,24">
+                    <StackPanel Spacing="20">
+
+                        <!-- Project Header -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Dự án SGU"
+                                       FontSize="22" FontWeight="Bold" Foreground="#1A1A1A"/>
+                            <TextBlock Text="Quản lý công việc nhóm — Tổng quan dự án"
+                                       FontSize="13" Foreground="#888888"/>
+                        </StackPanel>
+
+                        <!-- Stats Cards Row -->
+                        <StackPanel x:Name="DashboardStatsPanel" Orientation="Horizontal" Spacing="12">
+                            <!-- Cards added from code-behind -->
+                        </StackPanel>
+
+                        <!-- Two-column layout: Members + Recent Activity -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                            <!-- Team Members -->
+                            <Border Grid.Column="0"
+                                    Background="#FAFAFA" BorderBrush="#E8E8E8"
+                                    BorderThickness="1" CornerRadius="8" Padding="16">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Text="Thành viên"
+                                               FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A"/>
+                                    <StackPanel x:Name="DashboardMembersPanel" Spacing="8"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Recent Activity -->
+                            <Border Grid.Column="1"
+                                    Background="#FAFAFA" BorderBrush="#E8E8E8"
+                                    BorderThickness="1" CornerRadius="8" Padding="16">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Text="Hoạt động gần đây"
+                                               FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A"/>
+                                    <StackPanel x:Name="DashboardActivityPanel" Spacing="6"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- Recent Messages -->
+                        <Border Background="#FAFAFA" BorderBrush="#E8E8E8"
+                                BorderThickness="1" CornerRadius="8" Padding="16">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Tin nhắn gần đây"
+                                           FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A"/>
+                                <StackPanel x:Name="DashboardMessagesPanel" Spacing="8"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ===== ASSIGN TASK PANEL (Giao công việc channel) ===== -->
+                <ScrollViewer x:Name="AssignTaskPanel"
+                              Visibility="Collapsed"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="24,20,24,24">
+                    <StackPanel Spacing="20" MaxWidth="560" HorizontalAlignment="Left">
+
+                        <!-- Header -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Giao công việc"
+                                       FontSize="20" FontWeight="Bold" Foreground="#1A1A1A"/>
+                            <TextBlock Text="Tạo và giao task mới cho thành viên trong team"
+                                       FontSize="13" Foreground="#888888"/>
+                        </StackPanel>
+
+                        <!-- Form -->
+                        <Border Background="#FAFAFA" BorderBrush="#E8E8E8"
+                                BorderThickness="1" CornerRadius="8" Padding="20">
+                            <StackPanel Spacing="16">
+
+                                <!-- Task name -->
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Công việc" FontSize="13" FontWeight="SemiBold"
+                                               Foreground="#555555"/>
+                                    <TextBox x:Name="AssignTaskNameBox"
+                                             PlaceholderText="Nhập tên công việc..."
+                                             CornerRadius="6"/>
+                                </StackPanel>
+
+                                <!-- Description -->
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Mô tả" FontSize="13" FontWeight="SemiBold"
+                                               Foreground="#555555"/>
+                                    <TextBox x:Name="AssignTaskDescBox"
+                                             PlaceholderText="Nhập mô tả ngắn..."
+                                             TextWrapping="Wrap"
+                                             AcceptsReturn="True"
+                                             MinHeight="80"
+                                             CornerRadius="6"/>
+                                </StackPanel>
+
+                                <!-- Assign to -->
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Giao cho" FontSize="13" FontWeight="SemiBold"
+                                               Foreground="#555555"/>
+                                    <ComboBox x:Name="AssignTaskMemberCombo"
+                                              PlaceholderText="Chọn thành viên..."
+                                              HorizontalAlignment="Stretch"
+                                              CornerRadius="6"/>
+                                </StackPanel>
+
+                                <!-- Deadline -->
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Deadline" FontSize="13" FontWeight="SemiBold"
+                                               Foreground="#555555"/>
+                                    <DatePicker x:Name="AssignTaskDeadline"
+                                                HorizontalAlignment="Stretch"
+                                                DayFormat="{}{day.integer(2)}"
+                                                MonthFormat="{}{month.integer(2)}"
+                                                YearFormat="{}{year.full}"/>
+                                </StackPanel>
+
+                                <!-- Status -->
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Trạng thái" FontSize="13" FontWeight="SemiBold"
+                                               Foreground="#555555"/>
+                                    <ComboBox x:Name="AssignTaskStatusCombo"
+                                              HorizontalAlignment="Stretch"
+                                              CornerRadius="6"
+                                              SelectedIndex="0">
+                                        <ComboBoxItem Content="Todo"/>
+                                        <ComboBoxItem Content="Doing"/>
+                                        <ComboBoxItem Content="Done"/>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <!-- Submit button -->
+                                <Button Content="Giao task"
+                                        Click="AssignTaskSubmit_Click"
+                                        HorizontalAlignment="Right"
+                                        Padding="24,10"
+                                        Background="#1A73E8"
+                                        Foreground="White"
+                                        CornerRadius="6"
+                                        FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Existing tasks list -->
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Danh sách công việc hiện tại"
+                                       FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A"/>
+                            <ItemsRepeater x:Name="AssignTaskListRepeater"
+                                           ItemTemplate="{StaticResource TaskCardTemplate}">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Spacing="8"/>
+                                </ItemsRepeater.Layout>
+                            </ItemsRepeater>
+                        </StackPanel>
                 </StackPanel>
-            </ScrollViewer>
+                </ScrollViewer>
+
+            </Grid>
         </Grid>
+
+        <!-- ============================================================ -->
+        <!-- COLUMN 4: Members Panel (right side)                          -->
+        <!-- ============================================================ -->
+        <Border Grid.Column="4"
+                Background="#FAFAFA"
+                BorderBrush="#E0E0E0"
+                BorderThickness="1,0,0,0">
+            <Grid RowDefinitions="Auto,*,Auto">
+
+                <!-- Header -->
+                <Border Grid.Row="0"
+                        Padding="14,16,14,12"
+                        BorderBrush="#E0E0E0"
+                        BorderThickness="0,0,0,1">
+                    <TextBlock Text="THÀNH VIÊN"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="#888888"
+                               CharacterSpacing="60"/>
+                </Border>
+
+                <!-- Member list -->
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="8,10,8,10">
+                    <StackPanel x:Name="MemberListPanel" Spacing="2"/>
+                </ScrollViewer>
+
+                <!-- Add member button -->
+                <Border Grid.Row="2"
+                        Padding="0,8,0,14"
+                        HorizontalAlignment="Center">
+                    <Border Width="36" Height="36"
+                            CornerRadius="18"
+                            Background="#FAFAFA"
+                            BorderBrush="#D0D0D0"
+                            BorderThickness="1.5">
+                        <TextBlock Text="+"
+                                   Foreground="#888888"
+                                   FontSize="18"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                </Border>
+
+            </Grid>
+        </Border>
+
+        <!-- ============================================================ -->
+        <!-- USER MANAGEMENT PANEL (overlay, slides in from right)         -->
+        <!-- ============================================================ -->
+        <Border x:Name="UserPanelOverlay"
+                Grid.Column="3"
+                Grid.ColumnSpan="2"
+                Background="#80000000"
+                Visibility="Collapsed"
+                PointerPressed="UserPanelOverlay_PointerPressed"/>
+
+        <Border x:Name="UserManagementPanel"
+                Grid.Column="3"
+                Grid.ColumnSpan="2"
+                HorizontalAlignment="Right"
+                Width="380"
+                Background="#FFFFFF"
+                BorderBrush="#E0E0E0"
+                BorderThickness="1,0,0,0"
+                Visibility="Collapsed">
+            <Border.RenderTransform>
+                <TranslateTransform x:Name="UserPanelTranslate" X="400"/>
+            </Border.RenderTransform>
+
+            <Grid RowDefinitions="Auto,*">
+
+                <!-- Panel Header -->
+                <Border Grid.Row="0" Padding="20,16" BorderBrush="#E8E8E8" BorderThickness="0,0,0,1">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Thông tin thành viên"
+                                   FontSize="16" FontWeight="SemiBold" Foreground="#1A1A1A"
+                                   VerticalAlignment="Center"/>
+                        <Button Grid.Column="1"
+                                Content="&#xE711;"
+                                FontFamily="Segoe MDL2 Assets"
+                                Click="CloseUserPanel_Click"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="8"
+                                FontSize="14"
+                                Foreground="#888888"/>
+                    </Grid>
+                </Border>
+
+                <!-- Panel Content -->
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="20,16,20,20">
+                    <StackPanel Spacing="20">
+
+                        <!-- User Info -->
+                        <StackPanel Spacing="12" HorizontalAlignment="Center">
+                            <Border x:Name="UserPanelAvatar"
+                                    Width="64" Height="64" CornerRadius="32"
+                                    HorizontalAlignment="Center">
+                                <TextBlock x:Name="UserPanelAvatarText"
+                                           Foreground="White" FontSize="24" FontWeight="Bold"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock x:Name="UserPanelName"
+                                       FontSize="18" FontWeight="SemiBold" Foreground="#1A1A1A"
+                                       HorizontalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                <Border x:Name="UserPanelRoleBadge"
+                                        Background="#E8F0FE" CornerRadius="10" Padding="10,3">
+                                    <TextBlock x:Name="UserPanelRoleText"
+                                               FontSize="12" Foreground="#1A73E8" FontWeight="SemiBold"/>
+                                </Border>
+                                <Border x:Name="UserPanelOnlineBadge"
+                                        CornerRadius="10" Padding="10,3">
+                                    <TextBlock x:Name="UserPanelOnlineText"
+                                               FontSize="12" FontWeight="SemiBold"/>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Border Height="1" Background="#E8E8E8"/>
+
+                        <!-- Role editing (Owner only) -->
+                        <StackPanel x:Name="OwnerRoleSection" Spacing="8" Visibility="Collapsed">
+                            <TextBlock Text="Chỉnh sửa vai trò"
+                                       FontSize="13" FontWeight="SemiBold" Foreground="#555555"/>
+                            <ComboBox x:Name="UserPanelRoleCombo"
+                                      HorizontalAlignment="Stretch"
+                                      CornerRadius="6"
+                                      SelectionChanged="UserPanelRoleCombo_SelectionChanged">
+                                <ComboBoxItem Content="Owner"/>
+                                <ComboBoxItem Content="Admin"/>
+                                <ComboBoxItem Content="Member"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Permissions -->
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Quyền"
+                                       FontSize="13" FontWeight="SemiBold" Foreground="#555555"/>
+
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                <TextBlock Text="Quản lý thành viên" FontSize="13" Foreground="#444444"
+                                           VerticalAlignment="Center"/>
+                                <ToggleSwitch x:Name="PermManageMembers" Grid.Column="1"
+                                              OnContent="" OffContent=""
+                                              Toggled="Permission_Toggled"
+                                              IsEnabled="False"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                <TextBlock Text="Tạo task" FontSize="13" Foreground="#444444"
+                                           VerticalAlignment="Center"/>
+                                <ToggleSwitch x:Name="PermCreateTask" Grid.Column="1"
+                                              OnContent="" OffContent=""
+                                              Toggled="Permission_Toggled"
+                                              IsEnabled="False"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                <TextBlock Text="Chỉnh sửa task" FontSize="13" Foreground="#444444"
+                                           VerticalAlignment="Center"/>
+                                <ToggleSwitch x:Name="PermEditTask" Grid.Column="1"
+                                              OnContent="" OffContent=""
+                                              Toggled="Permission_Toggled"
+                                              IsEnabled="False"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                <TextBlock Text="Xóa task" FontSize="13" Foreground="#444444"
+                                           VerticalAlignment="Center"/>
+                                <ToggleSwitch x:Name="PermDeleteTask" Grid.Column="1"
+                                              OnContent="" OffContent=""
+                                              Toggled="Permission_Toggled"
+                                              IsEnabled="False"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                <TextBlock Text="Giao task" FontSize="13" Foreground="#444444"
+                                           VerticalAlignment="Center"/>
+                                <ToggleSwitch x:Name="PermAssignTask" Grid.Column="1"
+                                              OnContent="" OffContent=""
+                                              Toggled="Permission_Toggled"
+                                              IsEnabled="False"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                <TextBlock Text="Xem task" FontSize="13" Foreground="#444444"
+                                           VerticalAlignment="Center"/>
+                                <ToggleSwitch x:Name="PermViewTask" Grid.Column="1"
+                                              OnContent="" OffContent=""
+                                              Toggled="Permission_Toggled"
+                                              IsEnabled="False"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <Border Height="1" Background="#E8E8E8"/>
+
+                        <!-- Quick assign task (Owner only) -->
+                        <StackPanel x:Name="OwnerAssignSection" Spacing="10" Visibility="Collapsed">
+                            <TextBlock Text="Giao công việc"
+                                       FontSize="13" FontWeight="SemiBold" Foreground="#555555"/>
+
+                            <ComboBox x:Name="UserPanelTaskCombo"
+                                      PlaceholderText="Chọn task..."
+                                      HorizontalAlignment="Stretch"
+                                      CornerRadius="6"/>
+
+                            <Button Content="Giao task"
+                                    Click="UserPanelAssignTask_Click"
+                                    Padding="16,8"
+                                    Background="#1A73E8"
+                                    Foreground="White"
+                                    CornerRadius="6"
+                                    HorizontalAlignment="Right"/>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Border>
 
     </Grid>
 </Page>

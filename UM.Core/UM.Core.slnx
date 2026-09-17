@@ -16,4 +16,5 @@
     <Platform Solution="*|x86" Project="x86" />
   </Project>
   <Project Path="UM.Core.csproj" />
+  <Project Path="../UM.Admin/UM.Admin.csproj" />
 </Solution>
