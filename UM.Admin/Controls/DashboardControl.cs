@@ -43,8 +43,32 @@ namespace UM.Admin.Controls
                 Margin = new Padding(0, 0, 0, 16),
             };
 
-            statsFlow.Controls.Add(CreateStatCard("Total Users", stats.TotalUsers.ToString(), Color.FromArgb(66, 133, 244), Color.FromArgb(232, 240, 254)));
-            statsFlow.Controls.Add(CreateStatCard("Total Servers", stats.TotalServers.ToString(), Color.FromArgb(52, 168, 83), Color.FromArgb(232, 245, 233)));
+            var usersCard = CreateStatCard("Total Users", stats.TotalUsers.ToString(), Color.FromArgb(66, 133, 244), Color.FromArgb(232, 240, 254));
+            if (MockAdminService.Instance.CurrentAdmin.Role == AdminRole.UserAdmin)
+            {
+                usersCard.Cursor = Cursors.Hand;
+                void NavigateToUsers(object? s, EventArgs e)
+                {
+                    if (ParentForm is Forms.MainForm mf) mf.NavigateTo("Users");
+                }
+                usersCard.Click += NavigateToUsers;
+                foreach (Control c in usersCard.Controls) c.Click += NavigateToUsers;
+            }
+            statsFlow.Controls.Add(usersCard);
+            
+            var serversCard = CreateStatCard("Total Servers", stats.TotalServers.ToString(), Color.FromArgb(52, 168, 83), Color.FromArgb(232, 245, 233));
+            if (MockAdminService.Instance.CurrentAdmin.Role == AdminRole.ServerAdmin)
+            {
+                serversCard.Cursor = Cursors.Hand;
+                void NavigateToServers(object? s, EventArgs e)
+                {
+                    if (ParentForm is Forms.MainForm mf) mf.NavigateTo("Servers");
+                }
+                serversCard.Click += NavigateToServers;
+                foreach (Control c in serversCard.Controls) c.Click += NavigateToServers;
+            }
+            statsFlow.Controls.Add(serversCard);
+
             statsFlow.Controls.Add(CreateStatCard("New Today", stats.NewUsersToday.ToString(), Color.FromArgb(251, 188, 4), Color.FromArgb(255, 243, 224)));
             statsFlow.Controls.Add(CreateStatCard("This Week", stats.NewUsersThisWeek.ToString(), Color.FromArgb(234, 67, 53), Color.FromArgb(252, 232, 230)));
             statsFlow.Controls.Add(CreateStatCard("This Month", stats.NewUsersThisMonth.ToString(), Color.FromArgb(103, 58, 183), Color.FromArgb(237, 231, 246)));
@@ -60,7 +84,16 @@ namespace UM.Admin.Controls
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Margin = new Padding(0, 0, 0, 20),
             };
-            alertsFlow.Controls.Add(CreateStatCard("Pending Reports", stats.PendingReports.ToString(), Color.FromArgb(234, 67, 53), Color.FromArgb(252, 232, 230)));
+            var reportsCard = CreateStatCard("Pending Reports", stats.PendingReports.ToString(), Color.FromArgb(234, 67, 53), Color.FromArgb(252, 232, 230));
+            reportsCard.Cursor = Cursors.Hand;
+            void NavigateToReports(object? s, EventArgs e)
+            {
+                if (ParentForm is Forms.MainForm mf) mf.NavigateTo("Reports");
+            }
+            reportsCard.Click += NavigateToReports;
+            foreach (Control c in reportsCard.Controls) c.Click += NavigateToReports;
+            alertsFlow.Controls.Add(reportsCard);
+
             alertsFlow.Controls.Add(CreateStatCard("Banned Accounts", stats.BannedAccounts.ToString(), Color.FromArgb(183, 28, 28), Color.FromArgb(255, 235, 238)));
             mainFlow.Controls.Add(alertsFlow);
 
