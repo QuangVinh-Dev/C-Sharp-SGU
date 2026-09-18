@@ -1146,5 +1146,17 @@ namespace UM.UI.Views
             }
             return ColorHelper.FromArgb(255, 136, 136, 136);
         }
+
+        private async void PickImage_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: chọn ảnh
+        }
+
+        private void RemoveImage_Click(object sender, RoutedEventArgs e)
+        {
+            PreviewImage.Source = null;
+            PreviewFileName.Text = string.Empty;
+            ImagePreviewArea.Visibility = Visibility.Collapsed;
+        }
     }
 }

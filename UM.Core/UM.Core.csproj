@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,17 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="entity\" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="controller\" />
     <Folder Include="jwt\" />
     <Folder Include="dto\" />
-    <Folder Include="config\" />
     <Folder Include="websocket\" />
     <Folder Include="sercurity\" />
     <Folder Include="service\" />
     <Folder Include="repository\" />
-
-			  
   </ItemGroup>
 
 </Project>

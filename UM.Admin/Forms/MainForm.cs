@@ -5,18 +5,34 @@ namespace UM.Admin.Forms
 {
     public partial class MainForm : Form
     {
-        private Panel _sidebarPanel = null!;
-        private Panel _headerPanel = null!;
-        private Panel _contentPanel = null!;
+        // Two-pane Layout Architecture
+        private Panel _sidebarPanel = null!;      // Left Sidebar (Dock = Left, Width = 240)
+        private Panel _rightAreaPanel = null!;    // Right Container (Dock = Fill)
+        private Panel _headerPanel = null!;       // Header (Dock = Top inside Right Container, Height = 56)
+        private Panel _contentPanel = null!;      // Content (Dock = Fill inside Right Container)
+
+        // Header controls
         private Label _headerTitle = null!;
         private Label _headerSubtitle = null!;
+
+        // Sidebar controls
         private Label _adminNameLabel = null!;
         private Label _adminRoleLabel = null!;
         private ComboBox _roleCombo = null!;
+        private Panel _navContainer = null!;
+        //private FlowLayoutPanel _navTable = null!;
+
+        // 5 Standard Canonical Navigation Buttons
+        private Button _btnDashboard = null!;
+        private Button _btnUsers = null!;
+        private Button _btnServers = null!;
+        private Button _btnReports = null!;
+        private Button _btnAdminRoles = null!;
         private readonly List<Button> _navButtons = new();
+
         private UserControl? _currentControl;
 
-        // Colors
+        // Color Palette
         private static readonly Color SidebarBg = Color.FromArgb(30, 30, 46);
         private static readonly Color SidebarHover = Color.FromArgb(45, 45, 65);
         private static readonly Color SidebarActive = Color.FromArgb(55, 55, 85);
@@ -33,13 +49,29 @@ namespace UM.Admin.Forms
             InitializeComponent();
             SetupForm();
             BuildLayout();
+
+            // Set combobox UI, tạm gỡ event để tránh double-run
+            _roleCombo.SelectedIndexChanged -= RoleCombo_SelectedIndexChanged;
+            _roleCombo.SelectedItem = "SuperAdmin";
+            _roleCombo.SelectedIndexChanged += RoleCombo_SelectedIndexChanged;
+
+            // Khởi tạo admin/state + render nav tường minh, không dựa vào event side-effect
+            var adminService = MockAdminService.Instance;
+            adminService.CurrentAdmin = adminService.Admins.FirstOrDefault(a => a.Role == AdminRole.SuperAdmin)
+                                        ?? new AdminUser { Id = 99, Name = "Admin (SuperAdmin)", Role = AdminRole.SuperAdmin, Email = "superadmin@um.com" };
+            adminService.CurrentAdmin.Role = AdminRole.SuperAdmin;
+
+            _adminNameLabel.Text = adminService.CurrentAdmin.Name;
+            _adminRoleLabel.Text = AdminRole.SuperAdmin.ToString();
+            _headerSubtitle.Text = $"Logged in as: {adminService.CurrentAdmin.Name} ({adminService.CurrentAdmin.Role}) | {adminService.CurrentAdmin.Email}";
+
             ApplyRoleBasedNavigation();
             NavigateTo("Dashboard");
         }
 
         private void SetupForm()
         {
-            Text = "UM Admin Panel";
+            Text = "UM Admin Panel - TeamTalks";
             Size = new Size(1400, 850);
             MinimumSize = new Size(1100, 700);
             StartPosition = FormStartPosition.CenterScreen;
@@ -50,7 +82,9 @@ namespace UM.Admin.Forms
 
         private void BuildLayout()
         {
-            // ===== SIDEBAR =====
+            // ==========================================
+            // 1. LEFT SIDEBAR (Width = 240, Dock = Left)
+            // ==========================================
             _sidebarPanel = new Panel
             {
                 Dock = DockStyle.Left,
@@ -58,8 +92,13 @@ namespace UM.Admin.Forms
                 BackColor = SidebarBg,
             };
 
-            // Logo area
-            var logoPanel = new Panel { Dock = DockStyle.Top, Height = 64, BackColor = Color.FromArgb(24, 24, 38) };
+            // Logo panel at top of sidebar
+            var logoPanel = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 64,
+                BackColor = Color.FromArgb(24, 24, 38)
+            };
             var logoLabel = new Label
             {
                 Text = "UM Admin",
@@ -72,13 +111,18 @@ namespace UM.Admin.Forms
             logoPanel.Controls.Add(logoLabel);
             _sidebarPanel.Controls.Add(logoPanel);
 
-            // Role switcher (for mock testing)
-            var roleSwitchPanel = new Panel { Dock = DockStyle.Top, Height = 70, Padding = new Padding(12, 8, 12, 4) };
+            // Mock Role Switcher Panel
+            var roleSwitchPanel = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 72,
+                Padding = new Padding(16, 10, 16, 6)
+            };
             var roleLabel = new Label
             {
-                Text = "Mock Role:",
+                Text = "Mock Role Switcher:",
                 ForeColor = TextMuted,
-                Font = new Font("Segoe UI", 8F),
+                Font = new Font("Segoe UI", 8F, FontStyle.Bold),
                 AutoSize = false,
                 Height = 18,
                 Dock = DockStyle.Top,
@@ -87,49 +131,23 @@ namespace UM.Admin.Forms
             {
                 Dock = DockStyle.Top,
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                Font = new Font("Segoe UI", 9F),
+                Font = new Font("Segoe UI", 9.5F),
                 Height = 28,
             };
             _roleCombo.Items.AddRange(new object[] { "SuperAdmin", "UserAdmin", "ServerAdmin" });
-            _roleCombo.SelectedIndex = 0;
             _roleCombo.SelectedIndexChanged += RoleCombo_SelectedIndexChanged;
             roleSwitchPanel.Controls.Add(_roleCombo);
             roleSwitchPanel.Controls.Add(roleLabel);
             _sidebarPanel.Controls.Add(roleSwitchPanel);
+            logoPanel.SendToBack();
 
-            // Navigation buttons
-            var navContainer = new Panel { Dock = DockStyle.Fill, Padding = new Padding(0, 8, 0, 0) };
-            var navFlow = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.TopDown,
-                WrapContents = false,
-                AutoScroll = true,
-                Padding = new Padding(0),
-            };
-
-            // Section: Main
-            navFlow.Controls.Add(CreateSectionLabel("MAIN"));
-            navFlow.Controls.Add(CreateNavButton("Dashboard", "\U0001F4CA"));
-            navFlow.Controls.Add(CreateNavButton("Users", "\U0001F465"));
-            navFlow.Controls.Add(CreateNavButton("Servers", "\U0001F5A5"));
-            navFlow.Controls.Add(CreateNavButton("Reports", "\U0001F4CB"));
-
-            // Section: Administration
-            navFlow.Controls.Add(CreateSectionLabel("ADMINISTRATION"));
-            navFlow.Controls.Add(CreateNavButton("User Management", "\U0001F465"));
-            navFlow.Controls.Add(CreateNavButton("Admin Roles", "\U0001F511"));
-
-            navContainer.Controls.Add(navFlow);
-            _sidebarPanel.Controls.Add(navContainer);
-
-            // Admin info at bottom of sidebar
+            // Current Admin Info Panel at bottom of sidebar
             var adminInfoPanel = new Panel
             {
                 Dock = DockStyle.Bottom,
-                Height = 60,
+                Height = 64,
                 BackColor = Color.FromArgb(24, 24, 38),
-                Padding = new Padding(12, 8, 12, 8),
+                Padding = new Padding(16, 10, 16, 10),
             };
             _adminNameLabel = new Label
             {
@@ -137,7 +155,7 @@ namespace UM.Admin.Forms
                 ForeColor = TextWhite,
                 Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
                 AutoSize = false,
-                Height = 20,
+                Height = 22,
                 Dock = DockStyle.Top,
             };
             _adminRoleLabel = new Label
@@ -153,7 +171,60 @@ namespace UM.Admin.Forms
             adminInfoPanel.Controls.Add(_adminNameLabel);
             _sidebarPanel.Controls.Add(adminInfoPanel);
 
-            // ===== HEADER =====
+            // Navigation Container (Fill the middle of sidebar)
+            _navContainer = new Panel
+            {
+                Dock = DockStyle.Fill,
+                Padding = new Padding(0, 8, 0, 8),
+                AutoScroll = true,
+            };
+
+            // FlowLayoutPanel to layout vertical navigation buttons without TableLayoutPanel auto-size collapse
+            //_navTable = new FlowLayoutPanel
+            //{
+            //    Dock = DockStyle.Top,
+            //    FlowDirection = FlowDirection.TopDown,
+            //    WrapContents = false,
+            //    AutoSize = true,
+            //    AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            //    Padding = new Padding(0),
+            //    Margin = new Padding(0),
+            //};
+            //_navContainer.Controls.Add(_navTable);
+
+            //_navContainer.Resize += (s, e) =>
+            //{
+            //    int w = _navContainer.ClientSize.Width;
+            //    if (w > 0)
+            //    {
+            //        foreach (Control c in _navTable.Controls)
+            //        {
+            //            c.Width = w;
+            //        }
+            //    }
+            //};
+
+            // Create the 5 Canonical Navigation Buttons
+            _btnDashboard = CreateNavButton("Dashboard", "\U0001F4CA", "Dashboard");
+            _btnUsers = CreateNavButton("Users", "\U0001F465", "Users");
+            _btnServers = CreateNavButton("Servers", "\U0001F5A5", "Servers");
+            _btnReports = CreateNavButton("Reports", "\U0001F4CB", "Reports");
+            _btnAdminRoles = CreateNavButton("Admin Roles", "\U0001F511", "Admin Roles");
+
+            _sidebarPanel.Controls.Add(_navContainer);
+            _navContainer.BringToFront();
+
+            // ==========================================
+            // 2. RIGHT AREA CONTAINER (Dock = Fill)
+            // ==========================================
+            _rightAreaPanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = ContentBg,
+                Padding = new Padding(0),
+            };
+
+            // Top Header inside Right Area
             _headerPanel = new Panel
             {
                 Dock = DockStyle.Top,
@@ -161,8 +232,12 @@ namespace UM.Admin.Forms
                 BackColor = HeaderBg,
                 Padding = new Padding(24, 0, 24, 0),
             };
-            // Header bottom border
-            var headerBorder = new Panel { Dock = DockStyle.Bottom, Height = 1, BackColor = BorderColor };
+            var headerBorder = new Panel
+            {
+                Dock = DockStyle.Bottom,
+                Height = 1,
+                BackColor = BorderColor
+            };
             _headerTitle = new Label
             {
                 Text = "Dashboard",
@@ -171,7 +246,7 @@ namespace UM.Admin.Forms
                 AutoSize = false,
                 TextAlign = ContentAlignment.MiddleLeft,
                 Dock = DockStyle.Left,
-                Width = 300,
+                Width = 350,
             };
             _headerSubtitle = new Label
             {
@@ -181,13 +256,13 @@ namespace UM.Admin.Forms
                 AutoSize = false,
                 TextAlign = ContentAlignment.MiddleRight,
                 Dock = DockStyle.Right,
-                Width = 300,
+                Width = 450,
             };
             _headerPanel.Controls.Add(_headerTitle);
             _headerPanel.Controls.Add(_headerSubtitle);
             _headerPanel.Controls.Add(headerBorder);
 
-            // ===== CONTENT AREA =====
+            // Content Area inside Right Area
             _contentPanel = new Panel
             {
                 Dock = DockStyle.Fill,
@@ -195,42 +270,32 @@ namespace UM.Admin.Forms
                 Padding = new Padding(0),
             };
 
-            // Add to form (order matters for Dock)
-            Controls.Add(_contentPanel);
-            Controls.Add(_headerPanel);
+            // Order of adding inside Right Area (Content fills below Header)
+            _rightAreaPanel.Controls.Add(_contentPanel);
+            _rightAreaPanel.Controls.Add(_headerPanel);
+
+            // ==========================================
+            // 3. ADD CONTAINERS TO MAIN FORM
+            // ==========================================
+            Controls.Add(_rightAreaPanel);
             Controls.Add(_sidebarPanel);
         }
 
-        private Label CreateSectionLabel(string text)
-        {
-            return new Label
-            {
-                Text = text,
-                Font = new Font("Segoe UI", 7.5F, FontStyle.Bold),
-                ForeColor = TextMuted,
-                AutoSize = false,
-                Height = 32,
-                Width = 240,
-                Padding = new Padding(20, 12, 0, 0),
-                Margin = new Padding(0),
-            };
-        }
-
-        private Button CreateNavButton(string text, string icon)
+        private Button CreateNavButton(string text, string icon, string pageName)
         {
             var btn = new Button
             {
-                Text = $"  {icon}  {text}",
-                Tag = text,
+                Text = $"   {icon}   {text}",
+                Tag = pageName,
                 Font = new Font("Segoe UI", 10F),
                 ForeColor = TextWhite,
                 FlatStyle = FlatStyle.Flat,
                 BackColor = SidebarBg,
                 TextAlign = ContentAlignment.MiddleLeft,
-                Height = 40,
-                Width = 240,
+                Height = 44,
+                Dock = DockStyle.Fill,
                 Padding = new Padding(12, 0, 0, 0),
-                Margin = new Padding(0, 1, 0, 1),
+                Margin = new Padding(0),
                 Cursor = Cursors.Hand,
                 ImageAlign = ContentAlignment.MiddleLeft,
             };
@@ -250,17 +315,50 @@ namespace UM.Admin.Forms
             }
         }
 
-        private void NavigateTo(string page)
+        public void NavigateTo(string page)
         {
-            _headerTitle.Text = page;
+            var currentRole = MockAdminService.Instance.CurrentAdmin.Role;
 
-            // Update active nav button
+            // Strict Role-based access verification
+            if (page == "Servers" && currentRole != AdminRole.ServerAdmin)
+            {
+                MessageBox.Show("Truy cập bị từ chối: Chức năng Quản lý Server chỉ dành riêng cho ServerAdmin!",
+                    "Permission Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (page == "Users" && currentRole != AdminRole.UserAdmin)
+            {
+                MessageBox.Show("Truy cập bị từ chối: Chức năng Quản lý Người dùng chỉ dành riêng cho UserAdmin!",
+                    "Permission Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (page == "Admin Roles" && currentRole != AdminRole.SuperAdmin)
+            {
+                MessageBox.Show("Truy cập bị từ chối: Chức năng Quản lý Admin Roles chỉ dành riêng cho SuperAdmin!",
+                    "Permission Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Update Header Title according to Page
+            _headerTitle.Text = page switch
+            {
+                "Dashboard" => "Dashboard",
+                "Users" => "User Management",
+                "Servers" => "Server Management",
+                "Reports" => "Report Management",
+                "Admin Roles" => "System Admin Role Management",
+                _ => page
+            };
+
+            // Highlight Active Navigation Button
             foreach (var btn in _navButtons)
             {
                 btn.BackColor = (btn.Tag?.ToString() == page) ? SidebarActive : SidebarBg;
             }
 
-            // Dispose current control
+            // Dispose current content control safely
             if (_currentControl != null)
             {
                 _contentPanel.Controls.Remove(_currentControl);
@@ -268,15 +366,14 @@ namespace UM.Admin.Forms
                 _currentControl = null;
             }
 
-            // Create new content
+            // Instantiate corresponding UserControl
             UserControl? newControl = page switch
             {
                 "Dashboard" => new Controls.DashboardControl(),
                 "Users" => new Controls.UserManagementControl(),
-                "User Management" => new Controls.UserManagementControl(),
-                "Servers" => new Controls.ServerManagementControl(),
+                "Servers" => currentRole == AdminRole.ServerAdmin ? new Controls.ServerManagementControl() : null,
                 "Reports" => new Controls.ReportManagementControl(),
-                "Admin Roles" => new Controls.AdminRoleControl(),
+                "Admin Roles" => currentRole == AdminRole.SuperAdmin ? new Controls.AdminRoleControl() : null,
                 _ => null
             };
 
@@ -302,34 +399,61 @@ namespace UM.Admin.Forms
             };
 
             adminService.CurrentAdmin = adminService.Admins.FirstOrDefault(a => a.Role == role)
-                                        ?? adminService.Admins[0];
+                                        ?? new AdminUser { Id = 99, Name = $"Admin ({role})", Role = role, Email = $"{role.ToString().ToLower()}@um.com" };
             adminService.CurrentAdmin.Role = role;
 
             _adminNameLabel.Text = adminService.CurrentAdmin.Name;
             _adminRoleLabel.Text = role.ToString();
-            _headerSubtitle.Text = adminService.CurrentAdmin.Email;
+            _headerSubtitle.Text = $"Logged in as: {adminService.CurrentAdmin.Name} ({adminService.CurrentAdmin.Role}) | {adminService.CurrentAdmin.Email}";
 
             ApplyRoleBasedNavigation();
+
+            // Always navigate safely back to Dashboard on role change to prevent viewing forbidden pages
             NavigateTo("Dashboard");
         }
 
         private void ApplyRoleBasedNavigation()
         {
+            if (_navContainer == null) return;
+
             var role = MockAdminService.Instance.CurrentAdmin.Role;
 
-            foreach (var btn in _navButtons)
+            Button[] activeButtons = role switch
             {
-                var page = btn.Tag?.ToString();
-                btn.Visible = page switch
-                {
-                    "Dashboard" => true,
-                    "Users" => role == AdminRole.SuperAdmin,
-                    "User Management" => role == AdminRole.UserAdmin,
-                    "Servers" => role == AdminRole.SuperAdmin || role == AdminRole.ServerAdmin,
-                    "Reports" => true,
-                    "Admin Roles" => role == AdminRole.SuperAdmin,
-                    _ => true,
-                };
+                AdminRole.UserAdmin => new[] { _btnDashboard, _btnUsers, _btnReports },
+                AdminRole.ServerAdmin => new[] { _btnDashboard, _btnServers, _btnReports },
+                AdminRole.SuperAdmin => new[] { _btnDashboard, _btnReports, _btnAdminRoles },
+                _ => new[] { _btnDashboard, _btnReports }
+            };
+
+            _navContainer.SuspendLayout();
+
+            // Bỏ hết nút cũ ra khỏi container (không Dispose vì các nút được tái sử dụng)
+            foreach (var btn in _navButtons)
+                _navContainer.Controls.Remove(btn);
+
+            // Dock=Top xếp chồng theo thứ tự ngược: add sau cùng thì hiện trên cùng
+            for (int i = activeButtons.Length - 1; i >= 0; i--)
+            {
+                var btn = activeButtons[i];
+                btn.Dock = DockStyle.Top;
+                btn.Visible = true;
+                _navContainer.Controls.Add(btn);
+            }
+
+            _navContainer.ResumeLayout(true);
+            _navContainer.PerformLayout();
+
+            System.Diagnostics.Debug.WriteLine($"[NAV DEBUG] Role={role}, _navContainer.Controls.Count={_navContainer.Controls.Count}, " +
+                $"_navContainer.Size={_navContainer.Size}, _navContainer.Visible={_navContainer.Visible}, " +
+                $"_sidebarPanel.Size={_sidebarPanel.Size}");
+            Console.WriteLine($"[NAV DEBUG] Role={role}, _navContainer.Controls.Count={_navContainer.Controls.Count}, " +
+                $"_navContainer.Size={_navContainer.Size}, _navContainer.Visible={_navContainer.Visible}, " +
+                $"_sidebarPanel.Size={_sidebarPanel.Size}");
+            foreach (Control c in _navContainer.Controls)
+            {
+                System.Diagnostics.Debug.WriteLine($"  -> child: {c.Text}, Dock={c.Dock}, Visible={c.Visible}, Size={c.Size}, Location={c.Location}");
+                Console.WriteLine($"  -> child: {c.Text}, Dock={c.Dock}, Visible={c.Visible}, Size={c.Size}, Location={c.Location}");
             }
         }
     }

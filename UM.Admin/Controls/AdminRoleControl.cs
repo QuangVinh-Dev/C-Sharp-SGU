@@ -25,7 +25,7 @@ namespace UM.Admin.Controls
             // Access denied label (hidden by default)
             _accessDeniedLabel = new Label
             {
-                Text = "⛔ Access Denied\n\nOnly SuperAdmin can manage admin roles.",
+                Text = " Access Denied\n\nOnly SuperAdmin can manage admin roles.",
                 Font = new Font("Segoe UI", 14F),
                 ForeColor = Color.FromArgb(198, 40, 40),
                 TextAlign = ContentAlignment.MiddleCenter,

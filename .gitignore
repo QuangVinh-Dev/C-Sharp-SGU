@@ -1,3 +1,11 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+.DS_Store
+*.zip
+teamtalk-ui/<<<<<<< HEAD
 # macOS
 .DS_Store
 
@@ -16,3 +24,17 @@ UM.User/.git_backup/
 
 # Local frontend
 teamtalk-ui/
+=======
+.vs/
+**/.vs/
+
+bin/
+**/bin/
+
+obj/
+**/obj/
+
+*.user
+*.suo
+.DS_Store
+>>>>>>> origin/feature
