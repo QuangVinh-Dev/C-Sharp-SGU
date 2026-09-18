@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using BackendApi.Services;
+using BackendApi.DTOs.Users;
 
 namespace BackendApi.Controllers;
 
@@ -8,14 +11,50 @@ namespace BackendApi.Controllers;
 [Authorize]
 public class UsersController : ControllerBase
 {
+    private readonly IUserService _userService;
+
+    public UsersController(IUserService userService)
+    {
+        _userService = userService;
+    }
+
+    private long GetCurrentUserId()
+    {
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (long.TryParse(idClaim, out var id))
+            return id;
+        return 0;
+    }
+
     [HttpGet("me")]
-    public IActionResult GetMe() => Ok(new { success = true, data = "Get current user" });
+    public async Task<IActionResult> GetMe()
+    {
+        var id = GetCurrentUserId();
+        if (id == 0) return Unauthorized();
+
+        var profile = await _userService.GetUserProfileAsync(id);
+        if (profile == null) return NotFound(new { success = false, message = "User not found" });
+
+        return Ok(new { success = true, data = profile });
+    }
 
     [HttpGet("{id}")]
-    public IActionResult GetUser(long id) => Ok(new { success = true, data = "Get user by ID" });
+    public async Task<IActionResult> GetUser(long id)
+    {
+        var profile = await _userService.GetUserProfileAsync(id);
+        if (profile == null) return NotFound(new { success = false, message = "User not found" });
+        return Ok(new { success = true, data = profile });
+    }
 
     [HttpPut("me")]
-    public IActionResult UpdateMe() => Ok(new { success = true, data = "Update current user" });
+    public async Task<IActionResult> UpdateMe([FromBody] UpdateProfileRequest request)
+    {
+        var id = GetCurrentUserId();
+        if (id == 0) return Unauthorized();
+
+        var profile = await _userService.UpdateUserProfileAsync(id, request);
+        return Ok(new { success = true, data = profile });
+    }
 
     [HttpGet]
     [Authorize(Policy = "users.read")]

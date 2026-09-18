@@ -1,0 +1,18 @@
+# macOS
+.DS_Store
+
+# .NET
+**/bin/
+**/obj/
+
+# User-specific files
+.vs/
+
+# Archives
+*.zip
+
+# Local Git metadata
+UM.User/.git_backup/
+
+# Local frontend
+teamtalk-ui/

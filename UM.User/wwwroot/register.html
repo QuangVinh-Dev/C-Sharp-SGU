@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeamTalk - Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <div class="auth-layout">
+        
+        <!-- Left Showcase -->
+        <div class="auth-showcase">
+            <div class="showcase-logo">
+                <div class="showcase-logo-icon">TT</div>
+                TeamTalk
+            </div>
+            
+            <h1 class="showcase-headline">
+                Build your team workspace.
+            </h1>
+            
+            <div class="mock-channel" style="margin-bottom: 24px;">
+                <div class="mock-channel-header" style="color:var(--text)">
+                    <span>#</span> development
+                </div>
+                <div class="mock-channel-header">
+                    <span>#</span> design-system
+                </div>
+                <div style="display:flex; gap:8px; margin-top:24px; align-items:center;">
+                    <div style="display:flex; gap:-8px;">
+                        <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:#2563EB; color:white; font-size:12px; font-weight:600; border:2px solid white; z-index:4;">V</span>
+                        <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:#10B981; color:white; font-size:12px; font-weight:600; border:2px solid white; z-index:3; margin-left:-8px;">H</span>
+                        <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:#F59E0B; color:white; font-size:12px; font-weight:600; border:2px solid white; z-index:2; margin-left:-8px;">L</span>
+                        <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:#7C3AED; color:white; font-size:12px; font-weight:600; border:2px solid white; z-index:1; margin-left:-8px;">T</span>
+                    </div>
+                    <span style="color:var(--muted); font-size:14px; font-weight:500; margin-left:8px;">4 members active</span>
+                </div>
+            </div>
+            
+            <div style="font-size:15px; font-weight:500; color:var(--muted);">
+                ✓ No credit card required &nbsp;&bull;&nbsp; ✓ Instant setup
+            </div>
+        </div>
+
+        <!-- Right Form -->
+        <div class="auth-form-container">
+            <div class="auth-card" style="max-width:520px; padding:32px;">
+                <div class="auth-header" style="margin-bottom:24px;">
+                    <h2>Create your TeamTalk account</h2>
+                </div>
+                
+                <form id="registerForm">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" id="name" class="form-control" placeholder="John Doe">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="form-label">Work Email</label>
+                            <input type="email" id="email" class="form-control" placeholder="john@company.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" id="phone" class="form-control" placeholder="+1 (555) 000-0000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dob" class="form-label">Date of Birth</label>
+                            <input type="date" id="dob" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" id="password" class="form-control" placeholder="Enter password">
+                            <button type="button" class="password-toggle" tabindex="-1">👁</button>
+                            <div class="password-strength">
+                                <div class="strength-meter"></div>
+                                <div class="strength-meter"></div>
+                                <div class="strength-meter"></div>
+                                <div class="strength-meter"></div>
+                            </div>
+                            <div class="strength-text"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm password">
+                            <button type="button" class="password-toggle" tabindex="-1">👁</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top:8px;">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="terms"> 
+                            <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="margin-top:24px;">Register Work Account</button>
+                </form>
+                
+                <div class="auth-footer">
+                    Already have an account? <a href="login.html">Sign in</a>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

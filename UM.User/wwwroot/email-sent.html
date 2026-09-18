@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeamTalk - Check your inbox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <div class="auth-layout centered">
+        
+        <div class="auth-card" style="text-align: center;">
+            <div class="auth-header" style="margin-bottom:16px;">
+                <div class="large-icon" style="color:var(--success);">✓</div>
+                <h2>Check your inbox</h2>
+                <p>We’ve sent a password reset link to:</p>
+            </div>
+            
+            <div class="email-chip" id="displayEmail">alex.morgan@teamtalk.io</div>
+            
+            <p style="font-size:14px; color:var(--muted); margin:16px 0 32px 0;">
+                The reset link expires after 15 minutes.
+            </p>
+            
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <button type="button" class="btn btn-primary" onclick="window.location.href='https://mail.google.com'">Open Webmail</button>
+                <button type="button" class="btn btn-outline" onclick="window.location.href='login.html'">Back to Sign In</button>
+            </div>
+            
+            <div class="auth-footer">
+                Didn’t receive the email? <a href="#" onclick="alert('Resend link triggered.')">Resend</a>
+            </div>
+        </div>
+        
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

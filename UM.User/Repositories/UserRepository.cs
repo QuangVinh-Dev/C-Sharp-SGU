@@ -91,10 +91,16 @@ public class UserRepository : IUserRepository
         using var connection = _connectionFactory.CreateConnection() as SqlConnection;
         await connection!.OpenAsync();
         var query = @"
-            SELECT sr.Name 
-            FROM SystemAdmins sa
-            JOIN SystemRoles sr ON sa.RoleId = sr.Id
-            WHERE sa.UserId = @UserId";
+    SELECT DISTINCT sp.Code 
+    FROM SystemAdmins sa
+    JOIN SystemRoles sr 
+        ON sa.SystemRoleId = sr.Id
+    JOIN SystemRolePermissions srp 
+        ON sr.Id = srp.SystemRoleId
+    JOIN SystemPermissions sp 
+        ON srp.PermissionId = sp.Id
+    WHERE sa.UserId = @UserId
+      AND sa.RevokedAt IS NULL";
         using var command = new SqlCommand(query, connection);
         command.Parameters.AddWithValue("@UserId", userId);
         using var reader = await command.ExecuteReaderAsync();
@@ -113,8 +119,8 @@ public class UserRepository : IUserRepository
         var query = @"
             SELECT sp.Code 
             FROM SystemAdmins sa
-            JOIN SystemRoles sr ON sa.RoleId = sr.Id
-            JOIN SystemRolePermissions srp ON sr.Id = srp.RoleId
+            JOIN SystemRoles sr ON sa.SystemRoleId = sr.Id
+            JOIN SystemRolePermissions srp ON sr.Id = srp.SystemRoleId
             JOIN SystemPermissions sp ON srp.PermissionId = sp.Id
             WHERE sa.UserId = @UserId";
         using var command = new SqlCommand(query, connection);

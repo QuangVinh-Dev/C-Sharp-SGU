@@ -1,8 +1,5 @@
-using System.Net;
-using System.Net.Mail;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using BackendApi.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace BackendApi.Infrastructure.Email;
 
@@ -15,25 +12,18 @@ public class SmtpEmailSender : IEmailSender
         _emailOptions = emailOptions.Value;
     }
 
-    public async Task SendEmailAsync(string to, string subject, string htmlMessage)
+    public Task SendEmailAsync(string to, string subject, string htmlMessage)
     {
-        if (string.IsNullOrEmpty(_emailOptions.Host)) return; // Or throw
+        Console.WriteLine();
+        Console.WriteLine("========================================");
+        Console.WriteLine("           EMAIL OTP - DEV MODE");
+        Console.WriteLine("========================================");
+        Console.WriteLine($"To      : {to}");
+        Console.WriteLine($"Subject : {subject}");
+        Console.WriteLine($"Content : {htmlMessage}");
+        Console.WriteLine("========================================");
+        Console.WriteLine();
 
-        var client = new SmtpClient(_emailOptions.Host, _emailOptions.Port)
-        {
-            Credentials = new NetworkCredential(_emailOptions.Username, _emailOptions.Password),
-            EnableSsl = true
-        };
-
-        var mailMessage = new MailMessage
-        {
-            From = new MailAddress(_emailOptions.From),
-            Subject = subject,
-            Body = htmlMessage,
-            IsBodyHtml = true
-        };
-        mailMessage.To.Add(to);
-
-        await client.SendMailAsync(mailMessage);
+        return Task.CompletedTask;
     }
 }
