@@ -1,46 +1,27 @@
-using Microsoft.EntityFrameworkCore;
-using UM.Core.config;
-using UM.Core.repository;
-using UM.Core.sercurity;
-using UM.Core.service;
-using UM.Core.websocket;
-
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Controller & HttpContext
-builder.Services.AddControllers();
-builder.Services.AddHttpContextAccessor();
-
-// 2. Database configuration
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// 3. Security & WebSocket integration abstractions
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-builder.Services.AddScoped<IServerPermissionService, ServerPermissionService>();
-builder.Services.AddScoped<IServerEventPublisher, ServerEventPublisher>();
-
-// 4. Repositories
-builder.Services.AddScoped<IServerRepository, ServerRepository>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<IChannelRepository, ChannelRepository>();
-builder.Services.AddScoped<IServerMemberRepository, ServerMemberRepository>();
-builder.Services.AddScoped<IServerRoleRepository, ServerRoleRepository>();
-
-// 5. Services
-builder.Services.AddScoped<IServerService, ServerService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<IChannelService, ChannelService>();
+// Add services to the container.
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Middleware xử lý lỗi tập trung
-app.UseMiddleware<ExceptionMiddleware>();
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseRouting();
 
-app.MapControllers();
+app.UseAuthorization();
 
-app.MapGet("/", () => "UM.Core Server Management Backend API is running on .NET 8.");
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
