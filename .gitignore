@@ -1,20 +1,17 @@
-bin/
-obj/
-.vs/
-*.user
-*.suo
-.DS_Store
-*.zip
-teamtalk-ui/<<<<<<< HEAD
-# macOS
-.DS_Store
-
-# .NET
+# .NET build
 **/bin/
 **/obj/
 
-# User-specific files
+# Visual Studio
 .vs/
+**/.vs/
+
+# User-specific files
+*.user
+*.suo
+
+# macOS
+.DS_Store
 
 # Archives
 *.zip
@@ -24,17 +21,3 @@ UM.User/.git_backup/
 
 # Local frontend
 teamtalk-ui/
-=======
-.vs/
-**/.vs/
-
-bin/
-**/bin/
-
-obj/
-**/obj/
-
-*.user
-*.suo
-.DS_Store
->>>>>>> origin/feature

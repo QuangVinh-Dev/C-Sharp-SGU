@@ -2,7 +2,6 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
-using UM.Core.config;
 using UM.Core.Repository;
 using UM.Core.Security;
 using UM.Core.repository;
@@ -11,12 +10,7 @@ using UM.Core.Service;
 var builder = WebApplication.CreateBuilder(args);
 
 // ─── Database ─────────────────────────────────────────────────
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException(
-        "DefaultConnection is not configured.");
-
-builder.Services.AddScoped<DatabaseConnection>(_ =>
-    new DatabaseConnection(connectionString));
+builder.Services.AddScoped<DatabaseConnection>();
 
 // ─── Repositories ─────────────────────────────────────────────
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -26,6 +20,7 @@ builder.Services.AddScoped<ChannelRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IChannelService, ChannelService>();
 
 // ─── JWT Authentication ───────────────────────────────────────
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
