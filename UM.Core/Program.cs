@@ -1,8 +1,10 @@
+using UM.Core.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+//Dang ky dich vu ratelimit
+builder.Services.AddAppRateLimiting(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -17,6 +19,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseRateLimiter();
 
 app.UseAuthorization();
 

@@ -1,31 +1,19 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using UM.Core.Models;
+using Microsoft.AspNetCore.RateLimiting;
+using UM.Core.Config; 
 
-namespace UM.Core.Controllers;
-
-public class HomeController : Controller
+namespace UM.Core.Controllers
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    [ApiController] // Bắt buộc phải có để báo đây là API
+    [Route("api/[controller]")] // Đường dẫn sẽ thành /api/home
+    [EnableRateLimiting(RateLimitPolicies.Public)] // Gắn Rate Limit
+    public class HomeController : ControllerBase // Đổi thành ControllerBase, không phải Controller
     {
-        _logger = logger;
-    }
-
-    public IActionResult Index()
-    {
-        return View();
-    }
-
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        [HttpGet]
+        public IActionResult Index()
+        {
+            // Trả về JSON thay vì View()
+            return Ok(new { message = "Chào mừng đến với API UM.Core!" });
+        }
     }
 }
