@@ -46,6 +46,11 @@ public interface IAuthRepository
 
     // Audit
     Task AddAuditLogAsync(AuditLog auditLog);
+
+    Task<bool> TryConsumeEmailOtpAsync(long otpId, DateTime usedAt);
+    Task<bool> TryConsumeRefreshTokenAsync(Guid tokenId, DateTime revokedAt, string? revokedByIp, Guid replacedByTokenId);
+    Task IncrementFailedLoginCountAsync(long userId, int maxAttempts, DateTime lockedUntilTime, DateTime updatedAt);
+    Task<bool> ResetPasswordTransactionAsync(long userId, string passwordHash, long otpId, DateTime usedAt, DateTime updatedAt);
 }
 
 public class AuthRepository : IAuthRepository
@@ -203,5 +208,67 @@ public class AuthRepository : IAuthRepository
     public async Task AddAuditLogAsync(AuditLog auditLog)
     {
         await _db.InsertAsync(auditLog);
+    }
+
+    public async Task<bool> TryConsumeEmailOtpAsync(long otpId, DateTime usedAt)
+    {
+        var updated = await _db.GetTable<EmailOtp>()
+            .Where(x => x.Id == otpId && x.UsedAt == null)
+            .Set(x => x.UsedAt, usedAt)
+            .UpdateAsync();
+        return updated > 0;
+    }
+
+    public async Task<bool> TryConsumeRefreshTokenAsync(Guid tokenId, DateTime revokedAt, string? revokedByIp, Guid replacedByTokenId)
+    {
+        var updated = await _db.GetTable<RefreshToken>()
+            .Where(x => x.Id == tokenId && x.RevokedAt == null)
+            .Set(x => x.RevokedAt, revokedAt)
+            .Set(x => x.RevokedByIp, revokedByIp)
+            .Set(x => x.ReplacedByTokenId, replacedByTokenId)
+            .UpdateAsync();
+        return updated > 0;
+    }
+
+    public async Task IncrementFailedLoginCountAsync(long userId, int maxAttempts, DateTime lockedUntilTime, DateTime updatedAt)
+    {
+        await _db.GetTable<User>()
+            .Where(x => x.Id == userId)
+            .Set(x => x.FailedLoginCount, x => x.FailedLoginCount + 1)
+            .Set(x => x.LockedUntil, x => (x.FailedLoginCount + 1) >= maxAttempts ? lockedUntilTime : x.LockedUntil)
+            .Set(x => x.UpdatedAt, updatedAt)
+            .UpdateAsync();
+    }
+
+    public async Task<bool> ResetPasswordTransactionAsync(long userId, string passwordHash, long otpId, DateTime usedAt, DateTime updatedAt)
+    {
+        await using var transaction = await _db.BeginTransactionAsync();
+        try
+        {
+            var otpUpdated = await _db.GetTable<EmailOtp>()
+                .Where(x => x.Id == otpId && x.UsedAt == null)
+                .Set(x => x.UsedAt, usedAt)
+                .UpdateAsync();
+
+            if (otpUpdated == 0)
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
+
+            await _db.GetTable<User>()
+                .Where(x => x.Id == userId)
+                .Set(x => x.PasswordHash, passwordHash)
+                .Set(x => x.UpdatedAt, updatedAt)
+                .UpdateAsync();
+
+            await transaction.CommitAsync();
+            return true;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 }

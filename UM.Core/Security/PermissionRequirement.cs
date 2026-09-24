@@ -4,7 +4,7 @@ namespace UM.Core.Security;
 
 /// <summary>
 /// Custom authorization requirement that checks for a specific system permission code.
-/// Usage: [Authorize(Policy = "USER_READ")]
+/// Usage: [Authorize(Policy = "users.read")]
 /// </summary>
 public class PermissionRequirement : IAuthorizationRequirement
 {

@@ -123,6 +123,11 @@ public class AuthService : IAuthService
 
     public async Task<VerifyOtpResponse> VerifyOtpAsync(VerifyOtpRequest request, string? ipAddress)
     {
+        if (request.Purpose != "REGISTER")
+        {
+            throw new InvalidOperationException("Mục đích OTP không hợp lệ cho tác vụ này.");
+        }
+
         var user = await _authRepository.GetUserByEmailAsync(request.Email.Trim().ToLowerInvariant());
         if (user == null)
         {
@@ -169,26 +174,27 @@ public class AuthService : IAuthService
 
         // OTP is correct
         var now = DateTime.UtcNow;
-        otp.UsedAt = now;
-        await _authRepository.UpdateOtpAsync(otp);
-
-        if (request.Purpose == "REGISTER")
+        var consumed = await _authRepository.TryConsumeEmailOtpAsync(otp.Id, now);
+        
+        if (!consumed)
         {
-            user.IsEmailVerified = true;
-            user.UpdatedAt = now;
-            await _authRepository.UpdateUserAsync(user);
-
-            // Audit log
-            await _authRepository.AddAuditLogAsync(new AuditLog
-            {
-                ActorUserId = user.Id,
-                Action = "VERIFY_EMAIL",
-                EntityType = "User",
-                EntityId = user.Id,
-                IpAddress = ipAddress,
-                CreatedAt = now
-            });
+            throw new InvalidOperationException("Mã OTP đã được sử dụng hoặc vừa được xử lý.");
         }
+
+        user.IsEmailVerified = true;
+        user.UpdatedAt = now;
+        await _authRepository.UpdateUserAsync(user);
+
+        // Audit log
+        await _authRepository.AddAuditLogAsync(new AuditLog
+        {
+            ActorUserId = user.Id,
+            Action = "VERIFY_EMAIL",
+            EntityType = "User",
+            EntityId = user.Id,
+            IpAddress = ipAddress,
+            CreatedAt = now
+        });
 
         return new VerifyOtpResponse
         {
@@ -252,12 +258,14 @@ public class AuthService : IAuthService
         // Verify password
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
-            user.FailedLoginCount++;
+            var lockedUntil = now.AddMinutes(LockoutMinutes);
+            await _authRepository.IncrementFailedLoginCountAsync(user.Id, MaxFailedLoginAttempts, lockedUntil, now);
 
-            if (user.FailedLoginCount >= MaxFailedLoginAttempts)
+            // Fetch the updated user state to log accurately
+            var updatedUser = await _authRepository.GetUserByIdAsync(user.Id);
+
+            if (updatedUser != null && updatedUser.FailedLoginCount == MaxFailedLoginAttempts)
             {
-                user.LockedUntil = now.AddMinutes(LockoutMinutes);
-
                 // Audit: account locked
                 await _authRepository.AddAuditLogAsync(new AuditLog
                 {
@@ -268,15 +276,12 @@ public class AuthService : IAuthService
                     IpAddress = ipAddress,
                     Metadata = JsonSerializer.Serialize(new
                     {
-                        FailedAttempts = user.FailedLoginCount,
-                        LockedUntil = user.LockedUntil
+                        FailedAttempts = updatedUser.FailedLoginCount,
+                        LockedUntil = updatedUser.LockedUntil
                     }),
                     CreatedAt = now
                 });
             }
-
-            user.UpdatedAt = now;
-            await _authRepository.UpdateUserAsync(user);
 
             // Audit: login failed
             await _authRepository.AddAuditLogAsync(new AuditLog
@@ -286,7 +291,7 @@ public class AuthService : IAuthService
                 EntityType = "User",
                 EntityId = user.Id,
                 IpAddress = ipAddress,
-                Metadata = JsonSerializer.Serialize(new { FailedCount = user.FailedLoginCount }),
+                Metadata = JsonSerializer.Serialize(new { FailedCount = updatedUser?.FailedLoginCount ?? user.FailedLoginCount + 1 }),
                 CreatedAt = now
             });
 
@@ -356,7 +361,9 @@ public class AuthService : IAuthService
 
         if (existingToken.RevokedAt != null)
         {
-            throw new UnauthorizedAccessException("Refresh token đã bị thu hồi.");
+            // Replay detected! Revoke all tokens for this user.
+            await _authRepository.RevokeAllUserRefreshTokensAsync(existingToken.UserId, ipAddress);
+            throw new UnauthorizedAccessException("Refresh token đã bị thu hồi. Toàn bộ phiên đăng nhập đã bị đăng xuất.");
         }
 
         if (existingToken.ExpiresAt < DateTime.UtcNow)
@@ -365,10 +372,17 @@ public class AuthService : IAuthService
         }
 
         var user = await _authRepository.GetUserByIdAsync(existingToken.UserId);
-        if (user == null || !user.IsActive)
-        {
-            throw new UnauthorizedAccessException("Tài khoản không hợp lệ.");
-        }
+
+if (user == null || !user.IsActive)
+{
+    throw new UnauthorizedAccessException("Tài khoản không hợp lệ.");
+}
+
+if (user.IsSuspended &&
+    (user.SuspendedUntil == null || user.SuspendedUntil > DateTime.UtcNow))
+{
+    throw new UnauthorizedAccessException("Tài khoản đang bị tạm khóa.");
+}
 
         var now = DateTime.UtcNow;
 
@@ -393,12 +407,15 @@ public class AuthService : IAuthService
             CreatedByIp = ipAddress
         };
 
-        // Revoke old token with rotation link
-        existingToken.RevokedAt = now;
-        existingToken.RevokedByIp = ipAddress;
-        existingToken.ReplacedByTokenId = newRefreshToken.Id;
+        // Revoke old token with rotation link atomically
+        var rotated = await _authRepository.TryConsumeRefreshTokenAsync(existingToken.Id, now, ipAddress, newRefreshToken.Id);
+        
+        if (!rotated)
+        {
+            // Another request already rotated it (race condition prevented)
+            throw new UnauthorizedAccessException("Refresh token đã được xử lý bởi yêu cầu khác.");
+        }
 
-        await _authRepository.UpdateRefreshTokenAsync(existingToken);
         await _authRepository.AddRefreshTokenAsync(newRefreshToken);
 
         // Audit
@@ -426,12 +443,15 @@ public class AuthService : IAuthService
         var tokenHash = _jwtService.HashRefreshToken(refreshToken);
         var existingToken = await _authRepository.GetRefreshTokenAsync(tokenHash);
 
-        if (existingToken != null && existingToken.RevokedAt == null)
-        {
-            existingToken.RevokedAt = DateTime.UtcNow;
-            existingToken.RevokedByIp = ipAddress;
-            await _authRepository.UpdateRefreshTokenAsync(existingToken);
-        }
+        if (existingToken != null &&
+    existingToken.RevokedAt == null &&
+    existingToken.UserId == userId)
+{
+    existingToken.RevokedAt = DateTime.UtcNow;
+    existingToken.RevokedByIp = ipAddress;
+
+    await _authRepository.UpdateRefreshTokenAsync(existingToken);
+}
 
         // Audit
         await _authRepository.AddAuditLogAsync(new AuditLog
@@ -516,6 +536,16 @@ public class AuthService : IAuthService
         {
             throw new InvalidOperationException("Thông tin không hợp lệ.");
         }
+        if (!user.IsActive)
+{
+    throw new InvalidOperationException("Tài khoản đã bị vô hiệu hóa.");
+}
+
+if (user.IsSuspended &&
+    (user.SuspendedUntil == null || user.SuspendedUntil > DateTime.UtcNow))
+{
+    throw new InvalidOperationException("Tài khoản đang bị tạm khóa.");
+}
 
         // Verify OTP for RESET_PASSWORD purpose
         var otp = await _authRepository.GetLatestOtpAsync(email, "RESET_PASSWORD");
@@ -550,14 +580,14 @@ public class AuthService : IAuthService
 
         var now = DateTime.UtcNow;
 
-        // Mark OTP as used
-        otp.UsedAt = now;
-        await _authRepository.UpdateOtpAsync(otp);
+        // Perform atomic reset in transaction
+        var newPasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        var success = await _authRepository.ResetPasswordTransactionAsync(user.Id, newPasswordHash, otp.Id, now, now);
 
-        // Update password
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
-        user.UpdatedAt = now;
-        await _authRepository.UpdateUserAsync(user);
+        if (!success)
+        {
+            throw new InvalidOperationException("Mã OTP đã được sử dụng hoặc vừa được xử lý.");
+        }
 
         // Revoke all refresh tokens for this user
         await _authRepository.RevokeAllUserRefreshTokensAsync(user.Id, ipAddress);

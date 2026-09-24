@@ -8,6 +8,7 @@ namespace UM.Core.Controllers;
 
 [ApiController]
 [Route("api")]
+[Authorize(Policy = "servers.update")]
 public class ChannelsController : ControllerBase
 {
     private readonly IChannelService _channelService;

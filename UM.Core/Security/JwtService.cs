@@ -28,12 +28,13 @@ public class JwtService : IJwtService
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
-        {
-            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new(JwtRegisteredClaimNames.Email, user.Email),
-            new("public_code", user.PublicCode),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+{
+    new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+    new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+    new(JwtRegisteredClaimNames.Email, user.Email),
+    new("public_code", user.PublicCode),
+    new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+};
 
         // Add system role claims
         foreach (var role in roles)

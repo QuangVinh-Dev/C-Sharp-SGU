@@ -18,7 +18,7 @@ public class SystemAdmin
     public bool RequireMfa { get; set; }
 
     [Column("GrantedBy")]
-    public long GrantedBy { get; set; }
+    public long? GrantedBy { get; set; }
 
     [Column("GrantedAt")]
     public DateTime GrantedAt { get; set; }

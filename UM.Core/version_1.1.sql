@@ -272,7 +272,7 @@ CREATE TABLE dbo.SystemAdmins (
     UserId bigint NOT NULL,
     SystemRoleId int NOT NULL,
     RequireMfa bit DEFAULT 1 NOT NULL,
-    GrantedBy bigint NOT NULL,
+    GrantedBy bigint NULL,
     GrantedAt datetime2(3) DEFAULT sysutcdatetime() NOT NULL,
     RevokedBy bigint NULL,
     RevokedAt datetime2(3) NULL,
@@ -281,8 +281,8 @@ CREATE TABLE dbo.SystemAdmins (
     CONSTRAINT FK_SystemAdmins_RevokedBy FOREIGN KEY (RevokedBy) REFERENCES dbo.Users(Id),
     CONSTRAINT FK_SystemAdmins_Role FOREIGN KEY (SystemRoleId) REFERENCES dbo.SystemRoles(Id),
     CONSTRAINT FK_SystemAdmins_User FOREIGN KEY (UserId) REFERENCES dbo.Users(Id),
-    CONSTRAINT CK_SystemAdmins_NoSelfGrant CHECK (GrantedBy <> UserId)
-);
+CONSTRAINT CK_SystemAdmins_NoSelfGrant
+    CHECK (GrantedBy IS NULL OR GrantedBy <> UserId));
 CREATE UNIQUE NONCLUSTERED INDEX UQ_SystemAdmins_ActiveUser ON dbo.SystemAdmins (UserId) WHERE RevokedAt IS NULL;
 GO
 
