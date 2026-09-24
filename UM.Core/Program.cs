@@ -6,12 +6,17 @@ using Microsoft.IdentityModel.Tokens;
 using UM.Core.Repository;
 using UM.Core.Security;
 using UM.Core.Service;
+
 using Microsoft.OpenApi;
+
+using UM.Core.Seed;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ─── Database ─────────────────────────────────────────────────
 builder.Services.AddScoped<DatabaseConnection>();
+builder.Services.AddScoped<DatabaseSeeder>();
 
 // ─── Repositories ─────────────────────────────────────────────
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -78,6 +83,8 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -106,5 +113,13 @@ app.MapControllers();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider
+        .GetRequiredService<DatabaseSeeder>();
+
+    await seeder.SeedAsync();
+}
 
 app.Run();

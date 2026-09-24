@@ -9,7 +9,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: 8080
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=UMCoreDb;User Id=sa;Password=UmDocker@2026;TrustServerCertificate=True;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1435;Database=UMCoreDb;User Id=sa;Password=UmDocker@2026;TrustServerCertificate=True;"
     depends_on:
       sqlserver:
         condition: service_healthy
