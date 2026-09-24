@@ -1,7 +1,7 @@
 using UM.Core.DTOS.Request.Channel;
 using UM.Core.DTOS.Response.Channel;
 using UM.Core.Entities;
-using UM.Core.repository;
+using UM.Core.Repository;
 
 namespace UM.Core.Service;
 

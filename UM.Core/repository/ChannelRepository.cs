@@ -1,8 +1,6 @@
 using LinqToDB;
 using UM.Core.Entities;
-using UM.Core.Repository;
-
-namespace UM.Core.repository;
+namespace UM.Core.Repository;
 
 public class ChannelRepository
 {
@@ -30,7 +28,9 @@ public class ChannelRepository
                 .ToList());
     }
 
-    public Task<bool> ExistsByNameInCategoryAsync(long categoryId, string name)
+    public Task<bool> ExistsByNameInCategoryAsync(
+        long categoryId,
+        string name)
     {
         return Task.FromResult(
             _db.GetTable<Channel>()
@@ -65,21 +65,15 @@ public class ChannelRepository
         long serverId,
         long userId)
     {
-        var hasPermission =
-            (from member in _db.GetTable<ServerMember>()
-             join rolePermission in _db.GetTable<RolePermission>()
-                 on member.ServerRoleId equals rolePermission.ServerRoleId
-             join permission in _db.GetTable<Permission>()
-                 on rolePermission.PermissionId equals permission.Id
-             where member.ServerId == serverId
-                   && member.UserId == userId
-                   && member.ServerRoleId != null
-                   && member.IsBanned == false
-                   && member.LeftAt == null
-                   && permission.Code == "MANAGE_CHANNELS"
-             select permission.Id)
-            .Any();
+        // Schema hien tai khong co ServerMembers.ServerRoleId.
+        // Quyen quan ly channel duoc xac dinh theo OwnerId cua Server.
+        var isOwner = _db.GetTable<Server>()
+            .Any(x =>
+                x.Id == serverId &&
+                x.OwnerId == userId &&
+                x.DeletedAt == null &&
+                x.IsSuspended == false);
 
-        return Task.FromResult(hasPermission);
+        return Task.FromResult(isOwner);
     }
 }

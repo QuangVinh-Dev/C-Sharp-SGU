@@ -14,9 +14,6 @@ public class ServerMember
     [Column("UserId")]
     public long UserId { get; set; }
 
-    [Column("ServerRoleId")]
-    public long? ServerRoleId { get; set; }
-
     [Column("Nickname")]
     public string? Nickname { get; set; }
 

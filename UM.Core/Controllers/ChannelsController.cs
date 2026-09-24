@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UM.Core.DTOS.Request.Channel;
 using UM.Core.Service;
@@ -16,12 +17,14 @@ public class ChannelsController : ControllerBase
         _channelService = channelService;
     }
 
+    [Authorize]
     [HttpPost("categories/{categoryId:long}/channels")]
     public async Task<IActionResult> CreateChannel(
         long categoryId,
         [FromBody] CreateChannelRequest request)
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userIdClaim = User.FindFirstValue(
+            ClaimTypes.NameIdentifier);
 
         if (!long.TryParse(userIdClaim, out var userId))
         {
@@ -48,10 +51,12 @@ public class ChannelsController : ControllerBase
         }
         catch (UnauthorizedAccessException ex)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, new
-            {
-                message = ex.Message
-            });
+            return StatusCode(
+                StatusCodes.Status403Forbidden,
+                new
+                {
+                    message = ex.Message
+                });
         }
         catch (ArgumentException ex)
         {
