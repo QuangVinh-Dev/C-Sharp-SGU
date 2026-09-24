@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using UM.Core.Repository;
 using UM.Core.Security;
+using UM.Core.repository;
 using UM.Core.Service;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,11 +15,13 @@ builder.Services.AddScoped<DatabaseConnection>();
 
 // ─── Repositories ─────────────────────────────────────────────
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<ChannelRepository>();
 
-// ─── Services ─────────────────────────────────────────────────
+// ─── Services ────────────────────────────────────────────────
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IChannelService, ChannelService>();
 
 // ─── JWT Authentication ───────────────────────────────────────
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -71,7 +74,6 @@ if (app.Environment.IsDevelopment())
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
