@@ -34,4 +34,8 @@ public class ServerMember
 
     [Column("LeftAt")]
     public DateTime? LeftAt { get; set; }
+
+    //Them server roles
+    // [Column("Role"), NotNull]
+    // public ServerRole Role { get; set; } = ServerRole.Member;
 }

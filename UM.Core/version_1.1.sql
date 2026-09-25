@@ -4,7 +4,21 @@
 -- Changelog v1.1:
 --   + DROP TABLE IF EXISTS cho phép chạy lại nhiều lần
 --   + Seed 3 user mẫu (admin, user1, user2)
+--   + Thêm cột [Role] vào ServerMembers (enum: 1=Member, 2=Manager, 3=Admin, 4=Owner)
+--   + Tạo database nếu chưa tồn tại
 -- ============================================================
+
+-- Tạo database nếu chưa tồn tại
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'UMCoreDb')
+BEGIN
+    CREATE DATABASE UMCoreDb;
+    PRINT 'Database UMCoreDb created.';
+END
+ELSE
+BEGIN
+    PRINT 'Database UMCoreDb already exists.';
+END
+GO
 
 USE UMCoreDb;
 GO
@@ -486,6 +500,7 @@ CREATE NONCLUSTERED INDEX IX_ChatMembers_UserId ON dbo.ChatMembers (UserId) WHER
 GO
 
 -- ---------- ServerMembers ----------
+-- ĐÃ THÊM CỘT [Role] VÀ CONSTRAINT NGAY TRONG CREATE TABLE
 CREATE TABLE dbo.ServerMembers (
     Id bigint IDENTITY(1,1) NOT NULL,
     ServerId bigint NOT NULL,
@@ -497,14 +512,17 @@ CREATE TABLE dbo.ServerMembers (
     BannedBy bigint NULL,
     BanReason nvarchar(500) NULL,
     LeftAt datetime2(3) NULL,
+    [Role] tinyint DEFAULT 1 NOT NULL,
     CONSTRAINT PK_ServerMembers PRIMARY KEY (Id),
     CONSTRAINT UQ_ServerMembers_Server_User UNIQUE (ServerId, UserId),
     CONSTRAINT FK_ServerMembers_BannedBy FOREIGN KEY (BannedBy) REFERENCES dbo.Users(Id),
     CONSTRAINT FK_ServerMembers_Servers FOREIGN KEY (ServerId) REFERENCES dbo.Servers(Id) ON DELETE CASCADE,
-    CONSTRAINT FK_ServerMembers_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id)
+    CONSTRAINT FK_ServerMembers_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id),
+    CONSTRAINT CK_ServerMembers_Role CHECK ([Role] >= 1 AND [Role] <= 4)
 );
 CREATE UNIQUE NONCLUSTERED INDEX IX_ServerMembers_ServerId_UserId ON dbo.ServerMembers (ServerId, UserId) INCLUDE (IsBanned) WHERE LeftAt IS NULL;
 CREATE NONCLUSTERED INDEX IX_ServerMembers_UserId ON dbo.ServerMembers (UserId) WHERE LeftAt IS NULL;
+CREATE NONCLUSTERED INDEX IX_ServerMembers_Server_Role ON dbo.ServerMembers (ServerId, [Role]) WHERE LeftAt IS NULL;
 GO
 
 -- ---------- ServerRoles ----------

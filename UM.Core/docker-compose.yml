@@ -13,6 +13,8 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+      sqlserver-init:
+        condition: service_completed_successfully
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -32,6 +34,23 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+
+  # ← THÊM SERVICE NÀY
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql-tools
+    container_name: um-core-sqlserver-init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./version_1.1.sql:/scripts/version_1.1.sql:ro    # ← mount file SQL vào container
+    entrypoint: >
+      /bin/bash -c "
+        echo '=== Running version_1.1.sql ===';
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P 'UmDocker@2026' -C -i /scripts/version_1.1.sql;
+        echo '=== Done ===';
+      "
+    restart: "no"
 
 volumes:
   sqlserver_data:

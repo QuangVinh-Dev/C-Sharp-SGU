@@ -55,7 +55,7 @@ public class ChannelService : IChannelService
         if (!hasPermission)
         {
             throw new UnauthorizedAccessException(
-                "Bạn không có quyền MANAGE_CHANNELS.");
+                "Bạn không có quyền .");
         }
 
         var exists = await _channelRepository
